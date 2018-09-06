@@ -9,6 +9,28 @@ var events = require('events')
 // 创建 eventEmitter 对象
 var eventEmitter = new events.EventEmitter()
 
+var xss_parse = function (source) {
+  if(!source) return {}
+
+  if(source.length >=0){
+    for(var i = 0;i<=source.length;i++){
+      xss_parse(source[i])
+    }
+  }else {
+    for(var key in source){
+      if(source.hasOwnProperty(key)){
+        var value = source[key]
+        if(typeof value === 'string' || typeof value === 'number'){
+          source[key] = xss(value)
+          return source
+        }else {
+          xss_parse(value)
+        }
+      }
+    }
+  }
+}
+
 router.all('*', function (req, res, next) {
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*')
   res.header('Access-Control-Allow-Headers', 'Content-Type,Content-Length, Authorization,\'Origin\',Accept,X-Requested-With')
@@ -22,17 +44,7 @@ router.all('*', function (req, res, next) {
 
     var keys = Object.keys(req.body)
 
-    if (keys.length) {
-      var parse_obj = JSON.parse(keys[0])
-      for (var key in parse_obj) {
-        if (parse_obj.hasOwnProperty(key)) {
-          parse_obj[key] = xss(parse_obj[key])
-        }
-      }
-      req.body = parse_obj
-    } else {
-      req.body = {}
-    }
+    req.body = xss_parse(JSON.parse(keys[0])) //xss验证
 
     var result = req.url.search(/\/login|\/add_user/i) !== -1
     if (result) {
