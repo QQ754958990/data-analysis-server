@@ -41,17 +41,14 @@ router.all('*', function (req, res, next) {
   if (req.method === 'OPTIONS') {
     res.sendStatus(200)
   } else {
-
-    var keys = Object.keys(req.body)
-
-    req.body = xss_parse(JSON.parse(keys[0])) //xss验证
-
     var result = req.url.search(/\/login|\/add_user/i) !== -1
     if (result) {
       next()
     } else {
       var get_args = token.get_args(req.query.token)
       if (token.validate(get_args)) {
+        var keys = Object.keys(req.body)
+        req.body = xss_parse(JSON.parse(keys[0])) //xss验证
         next()
       } else {
         res.sendStatus(401)
