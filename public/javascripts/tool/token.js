@@ -23,16 +23,11 @@ module.exports = {
   validate: function (args) {
     if (!args) return false
 
-    var result = true
-
-    for (var key in this.source_args) {
-      if (this.source_args.hasOwnProperty(key)) {
-        if (this.source_args[key] !== args[key]) {
-          result = false
-        }
-      }
+    if(args['user_id'] === this.source_args['user_id'] && args['user_password'] === this.source_args['user_password']) {
+      return true
+    }else {
+      return false
     }
-    return result
   }
 }
 

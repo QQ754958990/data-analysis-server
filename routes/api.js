@@ -73,8 +73,8 @@ router.post('/login', function (req, res, next) {
     if (err) throw err
 
     if (result.length > 0) {
-      token.source_args = req.body
-      var token_str = token.set_token(req.body)
+      token.source_args = JSON.parse(Object.keys(req.body)[0])
+      var token_str = token.set_token(token.source_args)
       res.end(JSON.stringify({
         token: token_str,
         content: result
