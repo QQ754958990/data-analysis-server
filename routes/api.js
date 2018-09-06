@@ -1,6 +1,7 @@
 var express = require('express')
 var router = express.Router()
 var path = require('path')
+var xss = require('xss')
 var token = require('../public/javascripts/tool/token')
 
 // 引入 events 模块
@@ -18,7 +19,21 @@ router.all('*', function (req, res, next) {
   if (req.method === 'OPTIONS') {
     res.sendStatus(200)
   } else {
-    req.body = JSON.parse(Object.keys(req.body)[0])
+
+    var keys = Object.keys(req.body)
+
+    if (keys.length) {
+      var parse_obj = JSON.parse(keys[0])
+      for (var key in parse_obj) {
+        if (parse_obj.hasOwnProperty(key)) {
+          parse_obj[key] = xss(parse_obj[key])
+        }
+      }
+      req.body = parse_obj
+    } else {
+      req.body = {}
+    }
+
     var result = req.url.search(/\/login|\/add_user/i) !== -1
     if (result) {
       next()
@@ -109,12 +124,12 @@ router.post('/data_list', function (req, res, next) {
 
 router.post('/delete_data', function (req, res, next) {
 
-  db.collection("data").deleteOne(req.body, function(err, obj) {
-    if (err) throw err;
+  db.collection('data').deleteOne(req.body, function (err, obj) {
+    if (err) throw err
     res.end(JSON.stringify({
-      content:obj
+      content: obj
     }))
-  });
+  })
 
 })
 

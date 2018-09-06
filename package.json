@@ -15,6 +15,7 @@
     "morgan": "~1.9.0"
   },
   "devDependencies": {
-    "mongodb": "^3.1.4"
+    "mongodb": "^3.1.4",
+	"xss": "^1.0.3"
   }
 }
